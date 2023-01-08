@@ -20,7 +20,8 @@ database_name = os.getenv('DATABASE_NAME')
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounts.db'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:LoneWolf007@localhost:5432/accounts'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}'
+postgresql_path = os.environ.get('DATABASE_URL', f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}')
+app.config['SQLALCHEMY_DATABASE_URI'] = postgresql_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
