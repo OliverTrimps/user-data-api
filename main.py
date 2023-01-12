@@ -39,8 +39,8 @@ def load_user(user_id):
 
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
+    # first_name = db.Column(db.String(50), nullable=False)
+    # last_name = db.Column(db.String(50), nullable=False)
     user_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
@@ -53,8 +53,8 @@ class Users(UserMixin, db.Model):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/')
@@ -66,7 +66,7 @@ def home():
 def register():
     email = request.form.get('email')
     password = request.form.get('password')
-    print(email, password)
+    # print(email, password)
     user = Users.query.filter_by(email=email).first()
     # username = user.user_name
     if user:
@@ -77,9 +77,7 @@ def register():
     else:
         hash_pass = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
         with app.app_context():
-            new_user = Users(first_name=request.form.get('fname'),
-                             last_name=request.form.get('lname'),
-                             user_name=request.form.get('uname'),
+            new_user = Users(user_name=request.form.get('uname'),
                              email=request.form.get('email'),
                              password=hash_pass,
                              date_registered=f"{date.month}/{date.day}/{date.year}",)
@@ -112,6 +110,16 @@ def login():
         login_user(user_by_email, duration=timer)
         logged_in = current_user.is_authenticated
         return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
+
+
+@app.route("/user", methods=["GET"])
+def user():
+    guests = db.session.query(Users).all()
+    guest_in_session = current_user.user_name
+    guests_username = {}
+    for guest in guests:
+        guests_username['username'] = guest.user_name
+    return jsonify(response={'Users': f'{guests_username}', 'Current User': f'{guest_in_session}'})
 
 
 @app.route("/access")
