@@ -62,7 +62,7 @@ def home():
     return render_template('index.html')
 
 
-@app.route("/register", methods=['POST'])
+@app.route("/register", methods=["GET", 'POST'])
 def register():
     email = request.form.get('email')
     password = request.form.get('password')
@@ -86,7 +86,7 @@ def register():
     return jsonify(response={"success": "User Added!"}), 200
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     # user_name = request.form.get('fname')
     email = request.form.get('email')
@@ -118,7 +118,7 @@ def user():
     guest_in_session = current_user.user_name
     guests_username = {}
     for guest in guests:
-        guests_username['username'] = guest.user_name
+        guests_username[f'user{guest.id}'] = guest.user_name
     return jsonify(response={'Users': f'{guests_username}', 'Current User': f'{guest_in_session}'})
 
 
