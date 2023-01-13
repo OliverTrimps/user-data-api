@@ -11,7 +11,7 @@ load_dotenv()
 
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
-# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 database_user = os.getenv('DATABASE_USER')
 database_password = os.getenv('DATABASE_PASSWORD')
@@ -26,7 +26,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 date = datetime.now()
-timer = timedelta(minutes=2)
+# timer = timedelta(minutes=2)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -107,7 +107,7 @@ def login():
         return jsonify(response={"error": {"invalid credentials": "password is incorrect!"}}), 404
     else:
         # login_user(user_by_email)
-        login_user(user_by_email, duration=timer)
+        login_user(user_by_email)
         logged_in = current_user.is_authenticated
         return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
 
