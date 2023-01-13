@@ -67,9 +67,9 @@ def register():
     email = request.form.get('email')
     password = request.form.get('password')
     # print(email, password)
-    user = Users.query.filter_by(email=email).first()
+    guest = Users.query.filter_by(email=email).first()
     # username = user.user_name
-    if user:
+    if guest:
         return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
     elif Users.query.filter_by(user_name=request.form.get('uname')).first():
         # Users.query.filter_by(user_name=request.form.get('uname')).first()
@@ -91,7 +91,7 @@ def login():
     # user_name = request.form.get('fname')
     email = request.form.get('email')
     password = request.form.get('password')
-    print(email, password)
+    # print(email, password)
     # users = db.session.query(Users).all()
     # for user in users:
     #     if user == "":
