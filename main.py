@@ -5,6 +5,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS, cross_origin
 
 
 load_dotenv()
@@ -12,6 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+CORS(app, supports_credentials=True)
 
 database_user = os.getenv('DATABASE_USER')
 database_password = os.getenv('DATABASE_PASSWORD')
@@ -63,6 +65,7 @@ def home():
 
 
 @app.route("/register", methods=['POST'])
+@cross_origin(origins='*', supports_credentials=True)
 def register():
     email = request.form.get('email')
     password = request.form.get('password')
@@ -87,6 +90,7 @@ def register():
 
 
 @app.route("/login", methods=["POST"])
+@cross_origin(origins='*', supports_credentials=True)
 def login():
     # user_name = request.form.get('fname')
     email = request.form.get('email')
