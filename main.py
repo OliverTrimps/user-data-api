@@ -53,8 +53,8 @@ class Users(UserMixin, db.Model):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 
 @app.route('/')
