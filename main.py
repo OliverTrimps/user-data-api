@@ -71,21 +71,23 @@ def register():
     password = request.form.get('password')
     # print(email, password)
     guest = Users.query.filter_by(email=email).first()
-    # username = user.user_name
-    if guest:
-        return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
-    elif Users.query.filter_by(user_name=request.form.get('uname')).first():
-        # Users.query.filter_by(user_name=request.form.get('uname')).first()
-        return jsonify(response={"error": {"user exists": "username has been taken by another user!"}}), 401
-    else:
+
+    if request.method == "POST":
         hash_pass = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-        with app.app_context():
-            new_user = Users(user_name=request.form.get('uname'),
-                             email=request.form.get('email'),
-                             password=hash_pass,
-                             date_registered=f"{date.month}/{date.day}/{date.year}",)
-            db.session.add(new_user)
-            db.session.commit()
+        # username = user.user_name
+        if guest:
+            return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
+        elif Users.query.filter_by(user_name=request.form.get('uname')).first():
+            # Users.query.filter_by(user_name=request.form.get('uname')).first()
+            return jsonify(response={"error": {"user exists": "username has been taken by another user!"}}), 401
+        else:
+            with app.app_context():
+                new_user = Users(user_name=request.form.get('uname'),
+                                 email=request.form.get('email'),
+                                 password=hash_pass,
+                                 date_registered=f"{date.month}/{date.day}/{date.year}",)
+                db.session.add(new_user)
+                db.session.commit()
     return jsonify(response={"success": "User Added!"}), 200
 
 
