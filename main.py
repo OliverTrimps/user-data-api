@@ -68,12 +68,12 @@ def home():
 @cross_origin(origins='*', supports_credentials=True)
 def register():
     email = request.form.get('email')
-    password = request.form.get('password')
+    # password = request.form.get('password')
     # print(email, password)
     guest = Users.query.filter_by(email=email).first()
 
     if request.method == "POST":
-        hash_pass = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+        password = generate_password_hash(request.form.get('password'), method='pbkdf2:sha256', salt_length=8)
         # username = user.user_name
         if guest:
             return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
@@ -84,7 +84,7 @@ def register():
             with app.app_context():
                 new_user = Users(user_name=request.form.get('uname'),
                                  email=request.form.get('email'),
-                                 password=hash_pass,
+                                 password=password,
                                  date_registered=f"{date.month}/{date.day}/{date.year}",)
                 db.session.add(new_user)
                 db.session.commit()
