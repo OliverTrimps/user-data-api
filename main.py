@@ -11,19 +11,19 @@ from flask_cors import CORS, cross_origin
 load_dotenv()
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 CORS(app, supports_credentials=True)
 
-database_user = os.getenv('DATABASE_USER')
-database_password = os.getenv('DATABASE_PASSWORD')
-database_host = os.getenv('DATABASE_HOST')
-database_name = os.getenv('DATABASE_NAME')
+# database_user = os.getenv('DATABASE_USER')
+# database_password = os.getenv('DATABASE_PASSWORD')
+# database_host = os.getenv('DATABASE_HOST')
+# database_name = os.getenv('DATABASE_NAME')
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounts.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounts.db'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:LoneWolf007@localhost:5432/accounts'
-postgresql_path = os.environ.get('DATABASE_URL', f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}')
-app.config['SQLALCHEMY_DATABASE_URI'] = postgresql_path
+# postgresql_path = os.environ.get('DATABASE_URL', f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}')
+# app.config['SQLALCHEMY_DATABASE_URI'] = postgresql_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -68,13 +68,15 @@ def home():
 @cross_origin(origins='*', supports_credentials=True)
 def register():
     email = request.form.get('email')
-    # password = request.form.get('password')
+    password = request.form.get('password')
     # print(email, password)
     guest = Users.query.filter_by(email=email).first()
+    # print(request.form.get('password'))
 
     if request.method == "POST":
-        password = generate_password_hash(request.form.get('password'), method='pbkdf2:sha256', salt_length=8)
-        # username = user.user_name
+        # password = generate_password_hash(password=request.form.get('password'), method='pbkdf2:sha256', salt_length=8)
+        # # username = user.user_name
+        # print(password)
         if guest:
             return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
         elif Users.query.filter_by(user_name=request.form.get('uname')).first():
@@ -84,7 +86,7 @@ def register():
             with app.app_context():
                 new_user = Users(user_name=request.form.get('uname'),
                                  email=request.form.get('email'),
-                                 password=password,
+                                 password=request.form.get('password'),
                                  date_registered=f"{date.month}/{date.day}/{date.year}",)
                 db.session.add(new_user)
                 db.session.commit()
@@ -105,17 +107,19 @@ def login():
     user_by_email = Users.query.filter_by(email=email).first()
     # user_by_name = Users.query.filter_by(user_name=name).first()
     # print(user_by_email.user_name)
-    if not user_by_email:
-        return jsonify(response={"error": {"user not found": "email does not exist!"}}), 404
-    # elif not user_by_name:
-    #     return jsonify(response={"error": {"user not found": "username or email does not exist!"}}), 404
-    elif not check_password_hash(user_by_email.password, password):
-        return jsonify(response={"error": {"invalid credentials": "password is incorrect!"}}), 404
-    else:
-        # login_user(user_by_email)
-        login_user(user_by_email)
-        logged_in = current_user.is_authenticated
-        return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
+    if request.method == "POST":
+        if not user_by_email:
+            return jsonify(response={"error": {"user not found": "email does not exist!"}}), 404
+        # elif not user_by_name:
+        #     return jsonify(response={"error": {"user not found": "username or email does not exist!"}}), 404
+        # elif not check_password_hash(user_by_email.password, password):
+        elif password != user_by_email.password:
+            return jsonify(response={"error": {"invalid credentials": "password is incorrect!"}}), 404
+        else:
+            # login_user(user_by_email)
+            login_user(user_by_email)
+            logged_in = current_user.is_authenticated
+            return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
 
 
 @app.route("/user", methods=["GET"])
