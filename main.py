@@ -15,15 +15,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 CORS(app, supports_credentials=True)
 
-# database_user = os.getenv('DATABASE_USER')
-# database_password = os.getenv('DATABASE_PASSWORD')
-# database_host = os.getenv('DATABASE_HOST')
-# database_name = os.getenv('DATABASE_NAME')
+database_user = os.getenv('DATABASE_USER')
+database_password = os.getenv('DATABASE_PASSWORD')
+database_host = os.getenv('DATABASE_HOST')
+database_name = os.getenv('DATABASE_NAME')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounts.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounts.db'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:LoneWolf007@localhost:5432/accounts'
-# postgresql_path = os.environ.get('DATABASE_URL', f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}')
-# app.config['SQLALCHEMY_DATABASE_URI'] = postgresql_path
+postgresql_path = os.environ.get('DATABASE_URL', f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}')
+app.config['SQLALCHEMY_DATABASE_URI'] = postgresql_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -74,8 +74,8 @@ def register():
     print(request.form.get('password'))
 
     if request.method == "POST":
-        password = generate_password_hash(password=request.form.get('password'), method='pbkdf2:sha256', salt_length=8)
-        # username = user.user_name
+        password = generate_password_hash(password=request.form.get('password'))
+        # username = user.user_name , method='pbkdf2:sha256', salt_length=8
         print(password)
         if guest:
             return jsonify(response={"error": {"user exists": "an account with that email already exists!"}}), 401
