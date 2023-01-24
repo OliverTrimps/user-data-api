@@ -95,16 +95,17 @@ def login():
     password = request.json.get('password')
 
     user_by_email = Users.query.filter_by(email=email).first()
-    if password is None:
-        return jsonify(response={"error": {"No Data": "Password is a 'None' Value!"}}), 404
-    if not user_by_email:
-        return jsonify(response={"error": {"user not found": "email does not exist!"}}), 404
-    elif not check_password_hash(user_by_email.password, password):
-        return jsonify(response={"error": {"invalid credentials": "password is incorrect!"}}), 404
-    else:
-        login_user(user_by_email)
-        logged_in = current_user.is_authenticated
-        return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
+    if request.method == "POST":
+        if password is None:
+            return jsonify(response={"error": {"No Data": "Password is a 'None' Value!"}}), 404
+        if not user_by_email:
+            return jsonify(response={"error": {"user not found": "email does not exist!"}}), 404
+        elif not check_password_hash(user_by_email.password, password):
+            return jsonify(response={"error": {"invalid credentials": "password is incorrect!"}}), 404
+        else:
+            login_user(user_by_email)
+            logged_in = current_user.is_authenticated
+    return jsonify(response={"success": "login successful!", "status": f"{logged_in}"}), 200
 
 
 @app.route("/user", methods=["GET"])
